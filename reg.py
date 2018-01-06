@@ -1,3 +1,5 @@
+#fst_degree ok
+
 from __future__ import print_function
 import numpy as np
 from keras.models import Sequential
@@ -14,7 +16,7 @@ BATCH_SIZE = 32
 VERBOSE = 1
 NB_CLASSES = 1 #number of outputs
 OPTIMIZER = Adam() #optimizer
-N_HIDDEN = 128
+N_HIDDEN = 900
 VALIDATION_SPLIT = 0.2 #how much TRAIN is reserved for validation
 DROPOUT = 0.3
 
@@ -32,9 +34,11 @@ X = dataset[:, 0]
 Y = dataset[:, 1]
 
 model = Sequential()
-model.add(Dense(NB_CLASSES, input_shape=(1,)))
+model.add(Dense(1, input_dim=1))
 model.add(Activation('relu'))
-
+model.add(Dense(32))
+model.add(Activation('relu'))
+model.add(Dense(1))
 model.summary()
 
 #compile model
