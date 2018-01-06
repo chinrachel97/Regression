@@ -1,4 +1,5 @@
 #fst_degree ok
+#snd 1.8% accuracy
 
 from __future__ import print_function
 import numpy as np
@@ -11,17 +12,20 @@ import csv
 np.random.seed(1671) #for reproducibility
 
 #network and training
-NB_EPOCH = 200
-BATCH_SIZE = 32
+NB_EPOCH = 2000
+EPOCHS = 20
+LEARNING_RATE = 0.1
+DECAY_RATE = LEARNING_RATE / EPOCHS
+BATCH_SIZE = 128
 VERBOSE = 1
 NB_CLASSES = 1 #number of outputs
-OPTIMIZER = Adam() #optimizer
+OPTIMIZER = Adam(decay=DECAY_RATE) #optimizer
 N_HIDDEN = 900
 VALIDATION_SPLIT = 0.2 #how much TRAIN is reserved for validation
 DROPOUT = 0.3
 
 #read the file
-filename = 'fst_degree.csv'
+filename = 'snd_degree.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
 headers = next(reader)
@@ -36,7 +40,23 @@ Y = dataset[:, 1]
 model = Sequential()
 model.add(Dense(1, input_dim=1))
 model.add(Activation('relu'))
-model.add(Dense(32))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
+model.add(Activation('relu'))
+model.add(Dense(256))
 model.add(Activation('relu'))
 model.add(Dense(1))
 model.summary()
