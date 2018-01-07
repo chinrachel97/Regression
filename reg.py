@@ -1,5 +1,4 @@
-#lin_values (range between [0,1])have difference of ~.0001
-#removing layers increased accuracy significantly
+#lin_values good score
 
 from __future__ import print_function
 import numpy as np
@@ -12,13 +11,14 @@ from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
+from sklearn.metrics import r2_score
 import csv
 
 seed = 7
 np.random.seed(seed) #for reproducibility
 
 #network and training
-NB_EPOCH = 100
+NB_EPOCH = 50
 EPOCHS = 20
 LEARNING_RATE = 0.1
 DECAY_RATE = LEARNING_RATE / EPOCHS
@@ -30,7 +30,7 @@ N_HIDDEN = 900
 VALIDATION_SPLIT = 0.2 #how much TRAIN is reserved for validation
 DROPOUT = 0.3
 
-#read the file
+#read the file for training
 filename = 'lin_values.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
@@ -46,15 +46,33 @@ Y = dataset[:, 1]
 X = np.array(X)
 Y = np.array(Y)
 X = X.reshape(-1,1)
-Y = X.reshape(-1,1)
+Y = Y.reshape(-1,1)
+
+#read the file for testing
+filename = 'lin_values_test.csv'
+raw_data = open(filename, 'r')
+reader = csv.reader(raw_data)
+headers = next(reader)
+
+#load dataset
+dataset = np.loadtxt(raw_data, delimiter=",")
+
+#split into input and output variables
+X_test = dataset[:, 0]
+Y_test = dataset[:, 1]
+
+X_test = np.array(X_test)
+Y_test = np.array(Y_test)
+X_test = X_test.reshape(-1,1)
+Y_test = Y_test.reshape(-1,1)
 
 def baseline_model():
 	model = Sequential()
 	model.add(Dense(1, input_dim=1))
-	model.add(Dense(64))
+	model.add(Dense(32))
 	model.add(Activation('relu'))
 	model.add(Dense(1))
-	model.add(Activation('linear'))
+	
 	#compile model
 	model.compile(loss='mean_squared_error', optimizer=OPTIMIZER, 
 	metrics=['mean_squared_error'])
@@ -70,12 +88,15 @@ estimators = []
 estimators.append(('standardize', StandardScaler()))
 estimators.append(('mlp', kreg))
 pipeline = Pipeline(estimators)
-kfold = KFold(n_splits=10, random_state=seed)
+kfold = KFold(n_splits=2, random_state=seed)
 results = cross_val_score(pipeline, X, Y, cv=kfold)
-print("Error: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+print("Error: %.4f (%.4f) MSE" % (results.mean(), results.std()))
 
 #calculate predictions
 kreg.fit(X, Y, batch_size=16, epochs=NB_EPOCH)
 to_predict = np.array([.101,.120])
-predictions = kreg.predict(to_predict)
-print("Prediction:", predictions)
+predictions = kreg.predict(X_test)
+score = r2_score(Y_test, predictions)
+print("Y_test: ", Y_test[:20])
+print("Predictions: ", predictions[:20])
+print("Score: ", score)
