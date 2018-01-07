@@ -1,5 +1,3 @@
-#lin_values good score
-
 from __future__ import print_function
 import numpy as np
 from keras.models import Sequential
@@ -31,7 +29,7 @@ VALIDATION_SPLIT = 0.2 #how much TRAIN is reserved for validation
 DROPOUT = 0.3
 
 #read the file for training
-filename = 'lin_values.csv'
+filename = 'cube_values.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
 headers = next(reader)
@@ -49,7 +47,7 @@ X = X.reshape(-1,1)
 Y = Y.reshape(-1,1)
 
 #read the file for testing
-filename = 'lin_values_test.csv'
+filename = 'cube_values_test.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
 headers = next(reader)
@@ -94,7 +92,6 @@ print("Error: %.4f (%.4f) MSE" % (results.mean(), results.std()))
 
 #calculate predictions
 kreg.fit(X, Y, batch_size=16, epochs=NB_EPOCH)
-to_predict = np.array([.101,.120])
 predictions = kreg.predict(X_test)
 score = r2_score(Y_test, predictions)
 print("Y_test: ", Y_test[:20])
