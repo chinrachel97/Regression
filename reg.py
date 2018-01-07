@@ -1,4 +1,5 @@
-#lin_values have difference of ~1
+#lin_values (range between [0,1])have difference of ~.0001
+#removing layers increased accuracy significantly
 
 from __future__ import print_function
 import numpy as np
@@ -50,18 +51,10 @@ Y = X.reshape(-1,1)
 def baseline_model():
 	model = Sequential()
 	model.add(Dense(1, input_dim=1))
-	model.add(Dense(32))
-	model.add(Activation('relu'))
-	model.add(Dense(16))
-	model.add(Activation('relu'))
-	model.add(Dense(8))
-	model.add(Activation('relu'))
-	model.add(Dense(4))
-	model.add(Activation('relu'))
-	model.add(Dense(2))
+	model.add(Dense(64))
 	model.add(Activation('relu'))
 	model.add(Dense(1))
-	
+	model.add(Activation('linear'))
 	#compile model
 	model.compile(loss='mean_squared_error', optimizer=OPTIMIZER, 
 	metrics=['mean_squared_error'])
@@ -83,6 +76,6 @@ print("Error: %.2f (%.2f) MSE" % (results.mean(), results.std()))
 
 #calculate predictions
 kreg.fit(X, Y, batch_size=16, epochs=NB_EPOCH)
-to_predict = np.array([101,120])
+to_predict = np.array([.101,.120])
 predictions = kreg.predict(to_predict)
 print("Prediction:", predictions)
