@@ -29,10 +29,9 @@ VALIDATION_SPLIT = 0.2 #how much TRAIN is reserved for validation
 DROPOUT = 0.3
 
 #read the file for training
-filename = 'cube_values.csv'
+filename = 'quad_values.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
-headers = next(reader)
 
 #load dataset
 dataset = np.loadtxt(raw_data, delimiter=",")
@@ -47,10 +46,9 @@ X = X.reshape(-1,1)
 Y = Y.reshape(-1,1)
 
 #read the file for testing
-filename = 'cube_values_test.csv'
+filename = 'quad_values_test.csv'
 raw_data = open(filename, 'r')
 reader = csv.reader(raw_data)
-headers = next(reader)
 
 #load dataset
 dataset = np.loadtxt(raw_data, delimiter=",")
@@ -67,7 +65,13 @@ Y_test = Y_test.reshape(-1,1)
 def baseline_model():
 	model = Sequential()
 	model.add(Dense(1, input_dim=1))
-	model.add(Dense(32))
+	model.add(Dense(128))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
+	model.add(Activation('relu'))
+	model.add(Dense(128))
 	model.add(Activation('relu'))
 	model.add(Dense(1))
 	
@@ -90,10 +94,15 @@ kfold = KFold(n_splits=2, random_state=seed)
 results = cross_val_score(pipeline, X, Y, cv=kfold)
 print("Error: %.4f (%.4f) MSE" % (results.mean(), results.std()))
 
+#denormalize data
+def denorm(min, max, input):
+	z = (input * (max - min)) + min
+	return z
+	
 #calculate predictions
 kreg.fit(X, Y, batch_size=16, epochs=NB_EPOCH)
 predictions = kreg.predict(X_test)
 score = r2_score(Y_test, predictions)
-print("Y_test: ", Y_test[:20])
-print("Predictions: ", predictions[:20])
+print("Y_test: ", denorm(0, 4000000, Y_test[:20]))
+print("Predictions: ", denorm(0, 4000000, predictions[:20]))
 print("Score: ", score)
